@@ -1,0 +1,26 @@
+"use client";
+
+import React from "react";
+import { MessageList } from "./MessageList";
+import { Composer } from "./Composer";
+import { useChatStore } from "@/store/chatStore";
+
+export function ChatView() {
+  const clearChat = useChatStore((s) => s.clearChat);
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
+        <h2 className="text-sm font-medium text-zinc-300">Chat</h2>
+        <button
+          onClick={clearChat}
+          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          Clear
+        </button>
+      </div>
+      <MessageList />
+      <Composer onMessageSent={() => {}} />
+    </div>
+  );
+}
