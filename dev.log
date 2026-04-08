@@ -658,3 +658,152 @@
 [0]     at ignore-listed frames
 [0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
 [0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0]  POST /api/turn/execute 200 in 3.3min (next.js: 9ms, proxy.ts: 16ms, application-code: 3.3min)
+[0] [OpenRouter] Stream attempt 2 with nvidia/nemotron-3-super-120b-a12b:free failed: OpenRouter error: Provider returned error
+[0] [OpenRouter] Stream retry 2 for nvidia/nemotron-3-super-120b-a12b:free, waiting 2000ms
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0]  GET / 200 in 77ms (next.js: 10ms, proxy.ts: 8ms, application-code: 58ms)
+[0]  POST /api/turn/execute 200 in 4.4min (next.js: 16ms, proxy.ts: 9ms, application-code: 4.4min)
+[0]  GET /api/auth/get-session 200 in 186ms (next.js: 104ms, proxy.ts: 26ms, application-code: 56ms)
+[0] [2m2026-04-08T06:32:03.884Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:32:03.885Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [?25h
+[0] npm run dev:next exited with code 143
