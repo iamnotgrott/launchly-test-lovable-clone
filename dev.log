@@ -1,0 +1,660 @@
+
+> app@0.1.0 dev
+> concurrently "npm run dev:next" "npx convex dev"
+
+[0] 
+[0] > app@0.1.0 dev:next
+[0] > next dev
+[0] 
+[0] ▲ Next.js 16.2.2 (Turbopack)
+[0] - Local:         http://localhost:3000
+[0] - Network:       http://172.20.10.5:3000
+[0] - Environments: .env.local
+[0] ✓ Ready in 241ms
+[0] 
+[0] ⨯ ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   [90m16 |[0m });
+[0]   [90m17 |[0m
+[0] [31m[1m>[0m [90m18 |[0m [36mexport[0m [36mconst[0m metadata: [33mMetadata[0m = {
+[0]   [90m   |[0m              [31m[1m^^^^^^^^[0m
+[0]   [90m19 |[0m   title: [32m"Forge — AI App Builder"[0m,
+[0]   [90m20 |[0m   description: [32m"Build apps with natural language. Describe what you want, and watch it com...[0m
+[0]   [90m21 |[0m };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0] 
+[0]  GET / 500 in 107ms (next.js: 55ms, application-code: 52ms)
+[0] [browser] Uncaught Error: ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0] 
+[0]     at <unknown> (Error: ./src/app/layout.tsx:18:14)
+[0]     at <unknown> (Error: (./src/app/layout.tsx:18:14)
+[0] [browser] ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component] 
+[0] [browser] ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component] 
+[0] [browser] ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component] 
+[1] ✖ Cannot prompt for input in non-interactive terminals. (What would you like to configure?)
+[1] npx convex dev exited with code 1
+[0] [browser] ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component] 
+[0] [browser] ./src/app/layout.tsx:18:14
+[0] You are attempting to export "metadata" from a component marked with "use client", which is disallowed. "metadata" must be resolved on the server before the page component is rendered. Keep your page as a Server Component and move Client Component logic to a separate file. Read more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#why-generatemetadata-is-server-component-only
+[0]   16 | });
+[0]   17 |
+[0] > 18 | export const metadata: Metadata = {
+[0]      |              ^^^^^^^^
+[0]   19 |   title: "Forge — AI App Builder",
+[0]   20 |   description: "Build apps with natural language. Describe what you want, and watch it com...
+[0]   21 | };
+[0] 
+[0] Ecmascript file had an error
+[0] 
+[0] Import traces:
+[0]   Client Component Browser:
+[0]     ./src/app/layout.tsx [Client Component Browser]
+[0]     ./src/app/layout.tsx [Server Component]
+[0] 
+[0]   Client Component SSR:
+[0]     ./src/app/layout.tsx [Client Component SSR]
+[0]     ./src/app/layout.tsx [Server Component] 
+[0] ⨯ Error: No address provided to ConvexReactClient.
+[0] If trying to deploy to production, make sure to follow all the instructions found at https://docs.convex.dev/production/hosting/
+[0] If running locally, make sure to run `convex dev` and ensure the .env.local file is populated.
+[0]     at module evaluation (src/app/providers.tsx:5:16)
+[0]   3 | import { ConvexProvider, ConvexReactClient } from "convex/react";
+[0]   4 |
+[0] > 5 | const convex = new ConvexReactClient(
+[0]     |                ^
+[0]   6 |   process.env.NEXT_PUBLIC_CONVEX_URL as string
+[0]   7 | );
+[0]   8 | {
+[0]   digest: '4152703384'
+[0] }
+[0] ⨯ Error: No address provided to ConvexReactClient.
+[0] If trying to deploy to production, make sure to follow all the instructions found at https://docs.convex.dev/production/hosting/
+[0] If running locally, make sure to run `convex dev` and ensure the .env.local file is populated.
+[0]     at module evaluation (src/app/providers.tsx:5:16)
+[0]   3 | import { ConvexProvider, ConvexReactClient } from "convex/react";
+[0]   4 |
+[0] > 5 | const convex = new ConvexReactClient(
+[0]     |                ^
+[0]   6 |   process.env.NEXT_PUBLIC_CONVEX_URL as string
+[0]   7 | );
+[0]   8 | {
+[0]   digest: '4152703384'
+[0] }
+[0]  GET / 500 in 594ms (next.js: 167ms, application-code: 427ms)
+[0] ⨯ Error: No address provided to ConvexReactClient.
+[0] If trying to deploy to production, make sure to follow all the instructions found at https://docs.convex.dev/production/hosting/
+[0] If running locally, make sure to run `convex dev` and ensure the .env.local file is populated.
+[0]     at module evaluation (src/app/providers.tsx:5:16)
+[0]   3 | import { ConvexProvider, ConvexReactClient } from "convex/react";
+[0]   4 |
+[0] > 5 | const convex = new ConvexReactClient(
+[0]     |                ^
+[0]   6 |   process.env.NEXT_PUBLIC_CONVEX_URL as string
+[0]   7 | );
+[0]   8 | {
+[0]   digest: '4152703384'
+[0] }
+[0]  GET / 500 in 161ms (next.js: 5ms, application-code: 156ms)
+[0] ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[0] ⚠ Fast Refresh had to perform a full reload when ./src/app/providers.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[0] ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[0] ✓ Compiled in 61ms
+[0]  GET / 200 in 55ms (next.js: 9ms, application-code: 45ms)
+[0] ✓ Compiled in 287ms
+[0]  GET / 200 in 136ms (next.js: 52ms, application-code: 84ms)
+[0]  GET / 200 in 191ms (next.js: 36ms, application-code: 155ms)
+[0]  GET / 200 in 157ms (next.js: 94ms, application-code: 63ms)
+[0]  GET / 200 in 39ms (next.js: 14ms, application-code: 25ms)
+[0]  GET / 200 in 169ms (next.js: 3ms, application-code: 166ms)
+[0] ✓ Compiled in 90ms
+[0] ✓ Compiled in 32ms
+[0] ✓ Compiled in 32ms
+[0] ✓ Compiled in 26ms
+[0] ✓ Compiled in 31ms
+[0] ✓ Compiled in 28ms
+[0]  GET / 200 in 73ms (next.js: 55ms, application-code: 18ms)
+[0]  GET / 200 in 47ms (next.js: 3ms, application-code: 44ms)
+[0]  GET / 200 in 26ms (next.js: 1808µs, application-code: 25ms)
+[0]  GET / 200 in 29ms (next.js: 1759µs, application-code: 27ms)
+[0]  GET / 200 in 28ms (next.js: 1491µs, application-code: 27ms)
+[0]  GET / 200 in 28ms (next.js: 872µs, application-code: 27ms)
+[0]  GET / 200 in 24ms (next.js: 1922µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 907µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 970µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 1091µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 1096µs, application-code: 22ms)
+[0]  GET / 200 in 21ms (next.js: 1107µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1173µs, application-code: 20ms)
+[0]  GET / 200 in 22ms (next.js: 1001µs, application-code: 21ms)
+[0]  GET / 200 in 29ms (next.js: 981µs, application-code: 28ms)
+[0]  GET / 200 in 30ms (next.js: 1208µs, application-code: 29ms)
+[0]  GET / 200 in 29ms (next.js: 1039µs, application-code: 28ms)
+[0]  GET / 200 in 22ms (next.js: 1328µs, application-code: 21ms)
+[0]  GET / 200 in 22ms (next.js: 1042µs, application-code: 21ms)
+[0]  GET / 200 in 23ms (next.js: 1166µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 1072µs, application-code: 22ms)
+[0]  GET / 200 in 23ms (next.js: 1095µs, application-code: 21ms)
+[0]  GET / 200 in 23ms (next.js: 1105µs, application-code: 22ms)
+[0]  GET / 200 in 25ms (next.js: 1048µs, application-code: 24ms)
+[0]  GET / 200 in 20ms (next.js: 1106µs, application-code: 19ms)
+[0]  GET / 200 in 11ms (next.js: 1728µs, application-code: 10ms)
+[0] ✓ Compiled in 147ms
+[0]  GET / 200 in 72ms (next.js: 44ms, application-code: 28ms)
+[0]  GET / 200 in 20ms (next.js: 959µs, application-code: 19ms)
+[0]  GET / 200 in 20ms (next.js: 1378µs, application-code: 19ms)
+[0]  GET / 200 in 20ms (next.js: 744µs, application-code: 19ms)
+[0]  GET / 200 in 21ms (next.js: 1167µs, application-code: 20ms)
+[0]  GET / 200 in 20ms (next.js: 820µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 772µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1009µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1003µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 909µs, application-code: 20ms)
+[0]  GET / 200 in 23ms (next.js: 1049µs, application-code: 22ms)
+[0]  GET / 200 in 22ms (next.js: 1223µs, application-code: 21ms)
+[0]  GET / 200 in 22ms (next.js: 884µs, application-code: 21ms)
+[0]  GET / 200 in 21ms (next.js: 969µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1038µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1029µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 810µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1194µs, application-code: 20ms)
+[0]  GET / 200 in 21ms (next.js: 1133µs, application-code: 19ms)
+[0]  GET / 200 in 21ms (next.js: 959µs, application-code: 20ms)
+[0]  GET / 200 in 27ms (next.js: 980µs, application-code: 26ms)
+[0]  GET / 200 in 29ms (next.js: 936µs, application-code: 28ms)
+[0]  GET / 200 in 31ms (next.js: 1125µs, application-code: 30ms)
+[0]  GET / 200 in 27ms (next.js: 1439µs, application-code: 25ms)
+[0]  GET / 200 in 27ms (next.js: 1206µs, application-code: 25ms)
+[0]  GET / 200 in 24ms (next.js: 1115µs, application-code: 23ms)
+[0]  GET / 200 in 17ms (next.js: 1088µs, application-code: 16ms)
+[0]  GET / 200 in 8ms (next.js: 1116µs, application-code: 7ms)
+[0] ✓ Compiled in 146ms
+[0]  GET /login 200 in 876ms (next.js: 854ms, proxy.ts: 3ms, application-code: 19ms)
+[0]  GET /login 200 in 60ms (next.js: 4ms, proxy.ts: 3ms, application-code: 53ms)
+[0]  GET /login 200 in 97ms (next.js: 6ms, proxy.ts: 5ms, application-code: 86ms)
+[0]  GET /login 200 in 89ms (next.js: 7ms, proxy.ts: 25ms, application-code: 57ms)
+[0]  GET /login 200 in 50ms (next.js: 3ms, proxy.ts: 5ms, application-code: 42ms)
+[0]  GET /login 200 in 43ms (next.js: 3ms, proxy.ts: 4ms, application-code: 36ms)
+[0]  GET /login 200 in 36ms (next.js: 3ms, proxy.ts: 2ms, application-code: 31ms)
+[0]  GET /login 200 in 21ms (next.js: 2ms, proxy.ts: 3ms, application-code: 16ms)
+[0]  GET /login 200 in 24ms (next.js: 2ms, proxy.ts: 2ms, application-code: 19ms)
+[0]  GET /login 200 in 25ms (next.js: 1090µs, proxy.ts: 1210µs, application-code: 23ms)
+[0]  GET /login 200 in 29ms (next.js: 1039µs, proxy.ts: 2ms, application-code: 26ms)
+[0]  GET /login 200 in 27ms (next.js: 1334µs, proxy.ts: 5ms, application-code: 21ms)
+[0]  GET /login 200 in 24ms (next.js: 944µs, proxy.ts: 1391µs, application-code: 22ms)
+[0]  GET /login 200 in 25ms (next.js: 1314µs, proxy.ts: 1655µs, application-code: 22ms)
+[0]  GET /login 200 in 31ms (next.js: 1311µs, proxy.ts: 2ms, application-code: 28ms)
+[0]  GET /login 200 in 34ms (next.js: 1679µs, proxy.ts: 2ms, application-code: 30ms)
+[0]  GET /login 200 in 36ms (next.js: 1804µs, proxy.ts: 2ms, application-code: 31ms)
+[0]  GET /login 200 in 42ms (next.js: 3ms, proxy.ts: 4ms, application-code: 35ms)
+[0]  GET /login 200 in 48ms (next.js: 5ms, proxy.ts: 3ms, application-code: 41ms)
+[0]  GET /login 200 in 103ms (next.js: 1586µs, proxy.ts: 4ms, application-code: 97ms)
+[0]  GET /login 200 in 72ms (next.js: 6ms, proxy.ts: 15ms, application-code: 51ms)
+[0]  GET /login 200 in 24ms (next.js: 1068µs, proxy.ts: 3ms, application-code: 20ms)
+[0]  GET /login 200 in 24ms (next.js: 967µs, proxy.ts: 1919µs, application-code: 22ms)
+[0]  GET /login 200 in 23ms (next.js: 987µs, proxy.ts: 1897µs, application-code: 20ms)
+[0]  GET /login 200 in 30ms (next.js: 1453µs, proxy.ts: 3ms, application-code: 26ms)
+[0]  GET /login 200 in 34ms (next.js: 3ms, proxy.ts: 4ms, application-code: 27ms)
+[0]  GET /login 200 in 25ms (next.js: 4ms, proxy.ts: 4ms, application-code: 17ms)
+[0]  GET /login 200 in 33ms (next.js: 3ms, proxy.ts: 3ms, application-code: 27ms)
+[0]  GET /login 200 in 86ms (next.js: 1883µs, proxy.ts: 3ms, application-code: 81ms)
+[0]  GET /login 200 in 73ms (next.js: 3ms, proxy.ts: 2ms, application-code: 68ms)
+[0]  GET /login 200 in 55ms (next.js: 11ms, proxy.ts: 12ms, application-code: 31ms)
+[0]  GET /login 200 in 105ms (next.js: 43ms, proxy.ts: 36ms, application-code: 26ms)
+[0]  GET /login 200 in 19ms (next.js: 838µs, proxy.ts: 1295µs, application-code: 17ms)
+[0]  GET /login 200 in 12ms (next.js: 3ms, proxy.ts: 1377µs, application-code: 8ms)
+[0]  GET /login 200 in 70ms (next.js: 29ms, proxy.ts: 22ms, application-code: 19ms)
+[0]  GET /login 200 in 11ms (next.js: 1389µs, proxy.ts: 1413µs, application-code: 8ms)
+[0] ✓ Compiled in 30ms
+[0] ✓ Compiled in 27ms
+[0] ✓ Compiled in 58ms
+[0]  GET /login 200 in 108ms (next.js: 58ms, proxy.ts: 34ms, application-code: 16ms)
+[0]  GET /login 200 in 10ms (next.js: 1100µs, proxy.ts: 1270µs, application-code: 8ms)
+[0]  GET /login 200 in 8ms (next.js: 1013µs, proxy.ts: 1315µs, application-code: 6ms)
+[0]  GET /login 200 in 122ms (next.js: 36ms, proxy.ts: 32ms, application-code: 54ms)
+[0]  GET /login 200 in 56ms (next.js: 3ms, proxy.ts: 3ms, application-code: 51ms)
+[0]  GET /login 200 in 33ms (next.js: 1082µs, proxy.ts: 4ms, application-code: 28ms)
+[0]  GET /login 200 in 80ms (next.js: 37ms, proxy.ts: 24ms, application-code: 19ms)
+[0]  GET /login 200 in 9ms (next.js: 1142µs, proxy.ts: 1563µs, application-code: 7ms)
+[0]  GET /login 200 in 8ms (next.js: 838µs, proxy.ts: 941µs, application-code: 7ms)
+[0]  GET /login 200 in 100ms (next.js: 14ms, proxy.ts: 4ms, application-code: 81ms)
+[0]  GET /signup 200 in 341ms (next.js: 328ms, proxy.ts: 5ms, application-code: 8ms)
+[0] [2m2026-04-08T06:23:11.230Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:23:11.231Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0] [2m2026-04-08T06:23:11.715Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:23:11.717Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0]  POST /api/auth/sign-up/email 200 in 1156ms (next.js: 1090ms, proxy.ts: 7ms, application-code: 59ms)
+[0]  GET / 200 in 15ms (next.js: 9ms, proxy.ts: 1113µs, application-code: 6ms)
+[0]  GET /api/auth/get-session 200 in 28ms (next.js: 3ms, proxy.ts: 1075µs, application-code: 25ms)
+[0]  GET /api/auth/get-session 200 in 12ms (next.js: 3ms, proxy.ts: 4ms, application-code: 5ms)
+[0] [2m2026-04-08T06:23:12.307Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:23:12.308Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0]  POST /api/projects/create 200 in 53ms (next.js: 41ms, proxy.ts: 6ms, application-code: 6ms)
+[0] [OpenRouter] Rate limited. Waiting 5000ms...
+[0] [OpenRouter] Retry 1 for stepfun/step-3.5-flash:free, waiting 1000ms
+[0] [OpenRouter] stepfun/step-3.5-flash:free returned 859 chars
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0]  GET /api/auth/get-session 200 in 38ms (next.js: 15ms, proxy.ts: 10ms, application-code: 12ms)
+[0]  GET /api/auth/get-session 200 in 12ms (next.js: 3ms, proxy.ts: 4ms, application-code: 5ms)
+[0] [2m2026-04-08T06:24:58.731Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:24:58.733Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0]  POST /api/checkpoints 200 in 86ms (next.js: 60ms, proxy.ts: 6ms, application-code: 19ms)
+[0]  POST /api/files 200 in 59ms (next.js: 43ms, proxy.ts: 7ms, application-code: 9ms)
+[0]  POST /api/files 200 in 18ms (next.js: 5ms, proxy.ts: 4ms, application-code: 8ms)
+[0] [OpenRouter] Stream attempt 1 with nvidia/nemotron-3-super-120b-a12b:free failed: OpenRouter error: Provider returned error
+[0] [OpenRouter] Stream retry 1 for nvidia/nemotron-3-super-120b-a12b:free, waiting 1000ms
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0]  POST /api/turn/execute 200 in 3.9min (next.js: 55ms, proxy.ts: 3ms, application-code: 3.9min)
+[0]  GET / 200 in 118ms (next.js: 9ms, proxy.ts: 20ms, application-code: 89ms)
+[0]  GET /api/auth/get-session 200 in 23ms (next.js: 13ms, proxy.ts: 4ms, application-code: 6ms)
+[0] [2m2026-04-08T06:27:21.154Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[0] [2m2026-04-08T06:27:21.155Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0]  POST /api/projects/create 200 in 16ms (next.js: 4ms, proxy.ts: 4ms, application-code: 8ms)
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] Stream attempt 2 with nvidia/nemotron-3-super-120b-a12b:free failed: OpenRouter error: Provider returned error
+[0] [OpenRouter] Stream retry 2 for nvidia/nemotron-3-super-120b-a12b:free, waiting 2000ms
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] [OpenRouter] Rate limited. Waiting 5000ms...
+[0] [OpenRouter] stepfun/step-3.5-flash:free returned 936 chars
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] [OpenRouter] Retry 1 for stepfun/step-3.5-flash:free, waiting 1000ms
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] stepfun/step-3.5-flash:free returned 795 chars
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0]  POST /api/files 200 in 24ms (next.js: 7ms, proxy.ts: 7ms, application-code: 10ms)
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] Stream attempt 3 with nvidia/nemotron-3-super-120b-a12b:free failed: OpenRouter error: Provider returned error
+[0] [OpenRouter] Streaming with qwen/qwen3.6-plus:free...
+[0] [OpenRouter] Stream attempt 1 with qwen/qwen3.6-plus:free failed: OpenRouter API error (404): {"error":{"message":"The free model has been deprecated. Transition to qwen/qwen3.6-plus for continued paid access.","code":404},"user_id":"user_38qqhNr5gLX44e7Uaj7h5YK6E7P"}
+[0] [OpenRouter] Stream retry 1 for qwen/qwen3.6-plus:free, waiting 1000ms
+[0] [OpenRouter] Streaming with qwen/qwen3.6-plus:free...
+[0] [OpenRouter] Stream attempt 2 with qwen/qwen3.6-plus:free failed: OpenRouter API error (404): {"error":{"message":"The free model has been deprecated. Transition to qwen/qwen3.6-plus for continued paid access.","code":404},"user_id":"user_38qqhNr5gLX44e7Uaj7h5YK6E7P"}
+[0] [OpenRouter] Stream retry 2 for qwen/qwen3.6-plus:free, waiting 2000ms
+[0] [OpenRouter] Stream attempt 1 with nvidia/nemotron-3-super-120b-a12b:free failed: OpenRouter error: Provider returned error
+[0] [OpenRouter] Stream retry 1 for nvidia/nemotron-3-super-120b-a12b:free, waiting 1000ms
+[0] [OpenRouter] Streaming with qwen/qwen3.6-plus:free...
+[0] [OpenRouter] Stream attempt 3 with qwen/qwen3.6-plus:free failed: OpenRouter API error (404): {"error":{"message":"The free model has been deprecated. Transition to qwen/qwen3.6-plus for continued paid access.","code":404},"user_id":"user_38qqhNr5gLX44e7Uaj7h5YK6E7P"}
+[0] [Turn Execute] Stream error: All streaming retry attempts failed
+[0] ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection: ResponseAborted: 
+[0]     at ignore-listed frames
+[0] ⨯ unhandledRejection:  ResponseAborted: 
+[0]     at ignore-listed frames
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...
+[0] [OpenRouter] Streaming with nvidia/nemotron-3-super-120b-a12b:free...

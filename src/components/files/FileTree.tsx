@@ -1,14 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FileEntry } from "@/types";
-import { FileText, Folder, FolderOpen, ChevronRight, ChevronDown } from "lucide-react";
+import { FileText, Folder, FolderOpen, ChevronRight, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileTreeProps {
   entries: FileEntry[];
   activeFile: string | null;
   onFileClick: (path: string) => void;
+}
+
+function flattenEntries(entries: FileEntry[]): FileEntry[] {
+  const result: FileEntry[] = [];
+  function walk(items: FileEntry[]) {
+    for (const item of items) {
+      result.push(item);
+      if (item.isDirectory && item.children) {
+        walk(item.children);
+      }
+    }
+  }
+  walk(entries);
+  return result;
+}
+
+function filterEntries(entries: FileEntry[], query: string): FileEntry[] {
+  if (!query) return entries;
+  const lower = query.toLowerCase();
+  return entries
+    .map((entry) => {
+      if (entry.isDirectory && entry.children) {
+        const filtered = filterEntries(entry.children, query);
+        if (filtered.length > 0) {
+          return { ...entry, children: filtered };
+        }
+        if (entry.name.toLowerCase().includes(lower)) {
+          return entry;
+        }
+        return null;
+      }
+      if (entry.name.toLowerCase().includes(lower)) {
+        return entry;
+      }
+      return null;
+    })
+    .filter(Boolean) as FileEntry[];
 }
 
 function TreeItem({
@@ -70,6 +107,8 @@ function TreeItem({
 }
 
 export function FileTree({ entries, activeFile, onFileClick }: FileTreeProps) {
+  const [search, setSearch] = useState("");
+
   if (entries.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-zinc-500 text-sm">
@@ -78,17 +117,37 @@ export function FileTree({ entries, activeFile, onFileClick }: FileTreeProps) {
     );
   }
 
+  const filtered = filterEntries(entries, search);
+
   return (
-    <div className="overflow-y-auto h-full py-1">
-      {entries.map((entry) => (
-        <TreeItem
-          key={entry.path}
-          entry={entry}
-          depth={0}
-          activeFile={activeFile}
-          onFileClick={onFileClick}
-        />
-      ))}
+    <div className="flex flex-col h-full">
+      <div className="px-2 py-1.5 border-b border-zinc-800/50">
+        <div className="relative">
+          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter files..."
+            className="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-md pl-7 pr-2 py-1 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-600/50"
+          />
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto py-1">
+        {filtered.length === 0 ? (
+          <div className="px-4 py-3 text-xs text-zinc-500">No files match &ldquo;{search}&rdquo;</div>
+        ) : (
+          filtered.map((entry) => (
+            <TreeItem
+              key={entry.path}
+              entry={entry}
+              depth={0}
+              activeFile={activeFile}
+              onFileClick={onFileClick}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }

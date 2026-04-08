@@ -5,6 +5,7 @@ import { useProjectStore } from "@/store/projectStore";
 import { FileTree } from "./FileTree";
 import { FolderTree, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { FileTreeSkeleton } from "@/components/ui/Skeleton";
 
 export function FilePanel() {
   const files = useProjectStore((s) => s.files);
@@ -43,7 +44,11 @@ export function FilePanel() {
           <RefreshCw size={12} />
         </Button>
       </div>
-      <FileTree entries={files} activeFile={activeFile} onFileClick={openFile} />
+      {isLoading && files.length === 0 ? (
+        <FileTreeSkeleton />
+      ) : (
+        <FileTree entries={files} activeFile={activeFile} onFileClick={openFile} />
+      )}
     </div>
   );
 }

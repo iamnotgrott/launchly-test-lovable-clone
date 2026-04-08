@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useProjectStore } from "@/store/projectStore";
+import { useToastStore } from "@/store/toastStore";
 
 export function FileEditor() {
   const activeFile = useProjectStore((s) => s.activeFile);
@@ -10,6 +11,9 @@ export function FileEditor() {
   const activeProject = useProjectStore((s) => s.activeProject);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
+  const addToast = useToastStore((s) => s.addToast);
 
   const content = activeFile ? fileContents[activeFile] || "" : "";
 
@@ -46,8 +50,9 @@ export function FileEditor() {
         body: JSON.stringify({ action: "write", path: fullPath, content }),
       });
       setSaved(true);
+      addToast("File saved", "success");
     } catch (error) {
-      console.error("Failed to save:", error);
+      addToast("Failed to save file", "error");
     } finally {
       setIsSaving(false);
     }
@@ -64,6 +69,23 @@ export function FileEditor() {
     return () => window.removeEventListener("keydown", handler);
   }, [content, activeFile, activeProject]);
 
+  const handleScroll = () => {
+    if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+      highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
+    }
+  };
+
+  const getLanguage = (filename: string): string => {
+    const ext = filename.split(".").pop()?.toLowerCase() || "";
+    const map: Record<string, string> = {
+      ts: "typescript", tsx: "typescript", js: "javascript", jsx: "javascript",
+      css: "css", html: "html", json: "json", md: "markdown",
+      py: "python", rs: "rust", go: "go", rb: "ruby",
+    };
+    return map[ext] || "plaintext";
+  };
+
   if (!activeFile) {
     return (
       <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">
@@ -75,7 +97,12 @@ export function FileEditor() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800 bg-zinc-900">
-        <span className="text-xs text-zinc-400 font-mono">{activeFile}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-zinc-400 font-mono">{activeFile}</span>
+          <span className="text-xs text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">
+            {getLanguage(activeFile)}
+          </span>
+        </div>
         <div className="flex items-center gap-2">
           <span className={`text-xs ${saved ? "text-zinc-600" : "text-amber-400"}`}>
             {saved ? "Saved" : "Unsaved"}
@@ -89,12 +116,28 @@ export function FileEditor() {
           </button>
         </div>
       </div>
-      <textarea
-        value={content}
-        onChange={(e) => handleChange(e.target.value)}
-        className="flex-1 bg-zinc-950 text-zinc-100 font-mono text-sm p-4 resize-none focus:outline-none leading-relaxed"
-        spellCheck={false}
-      />
+      <div className="relative flex-1">
+        <div
+          ref={highlightRef}
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          aria-hidden="true"
+        >
+          <pre className="p-4 text-sm font-mono leading-relaxed text-transparent whitespace-pre">
+            {content || "\n"}
+          </pre>
+        </div>
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => handleChange(e.target.value)}
+          onScroll={handleScroll}
+          className="absolute inset-0 w-full h-full bg-zinc-950 text-zinc-100 font-mono text-sm p-4 resize-none focus:outline-none leading-relaxed whitespace-pre"
+          spellCheck={false}
+          autoCapitalize="off"
+          autoComplete="off"
+          autoCorrect="off"
+        />
+      </div>
     </div>
   );
 }

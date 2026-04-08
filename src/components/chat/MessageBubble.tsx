@@ -3,7 +3,7 @@
 import React from "react";
 import { Message } from "@/types";
 import { formatTime } from "@/lib/utils";
-import { Bot, User } from "lucide-react";
+import { Bot, User, Zap } from "lucide-react";
 
 interface MessageBubbleProps {
   message: Message;
@@ -11,6 +11,18 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
+  const isSystem = message.role === "system";
+
+  if (isSystem) {
+    return (
+      <div className="flex justify-center">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-800/40 border border-zinc-700/30 text-xs text-zinc-500">
+          <Zap size={10} />
+          {message.content}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""} group`}>
@@ -40,7 +52,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           <span className="text-xs text-zinc-500">{formatTime(message.createdAt)}</span>
           {message.model && (
             <span className="text-xs text-zinc-600 bg-zinc-800/50 px-1.5 py-0.5 rounded">
-              {message.model}
+              {message.model.split("/").pop()}
+            </span>
+          )}
+          {message.tokenUsage && (
+            <span className="flex items-center gap-0.5 text-xs text-zinc-600 bg-zinc-800/50 px-1.5 py-0.5 rounded">
+              <Zap size={10} />
+              {message.tokenUsage.prompt + message.tokenUsage.completion} tokens
             </span>
           )}
         </div>

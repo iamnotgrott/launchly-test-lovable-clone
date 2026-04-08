@@ -3,16 +3,30 @@
 import React from "react";
 import { MessageBubble } from "./MessageBubble";
 import { useChatStore } from "@/store/chatStore";
+import { useProjectStore } from "@/store/projectStore";
+import { FileText, Plus, Minus } from "lucide-react";
 
-export function MessageList() {
+interface MessageListProps {
+  scrollRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+export function MessageList({ scrollRef: externalScrollRef }: MessageListProps) {
   const messages = useChatStore((s) => s.messages);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const isStreaming = useChatStore((s) => s.isStreaming);
+  const setSuggestion = useChatStore((s) => s.setSuggestion);
+  const turns = useProjectStore((s) => s.turns);
+  const internalScrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = externalScrollRef || internalScrollRef;
 
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isStreaming]);
+
+  const getTurnFiles = (turnId: string) => {
+    return turns.find((t) => t.id === turnId)?.filesChanged || [];
+  };
 
   if (messages.length === 0) {
     return (
@@ -35,6 +49,7 @@ export function MessageList() {
             ].map((suggestion) => (
               <button
                 key={suggestion}
+                onClick={() => setSuggestion(suggestion)}
                 className="text-left px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-zinc-300 text-sm hover:bg-zinc-800 hover:border-zinc-600 transition-colors"
               >
                 {suggestion}
@@ -48,9 +63,37 @@ export function MessageList() {
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
-      ))}
+      {messages.map((message) => {
+        const turnFiles = message.turnId ? getTurnFiles(message.turnId) : [];
+        const totalAdditions = turnFiles.reduce((sum, f) => sum + f.additions, 0);
+        const totalDeletions = turnFiles.reduce((sum, f) => sum + f.deletions, 0);
+
+        return (
+          <React.Fragment key={message.id}>
+            <MessageBubble message={message} />
+            {!message.isStreaming && turnFiles.length > 0 && message.role === "assistant" && (
+              <div className="ml-11 -mt-3 mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800/50 border border-zinc-700/30 text-xs">
+                  <FileText size={12} className="text-zinc-500" />
+                  <span className="text-zinc-400">
+                    {turnFiles.length} file{turnFiles.length !== 1 ? "s" : ""} changed
+                  </span>
+                  {totalAdditions > 0 && (
+                    <span className="flex items-center gap-0.5 text-emerald-400">
+                      <Plus size={10} />{totalAdditions}
+                    </span>
+                  )}
+                  {totalDeletions > 0 && (
+                    <span className="flex items-center gap-0.5 text-red-400">
+                      <Minus size={10} />{totalDeletions}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }

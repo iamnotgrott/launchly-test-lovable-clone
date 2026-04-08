@@ -1,18 +1,44 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
+import crypto from "crypto";
 
-const PORT_FILE = path.join(process.env.HOME || "/tmp", ".ai-app-builder", ".preview-port");
+const PREVIEW_DIR = path.join(process.env.HOME || "/tmp", ".ai-app-builder", "previews");
 
-export async function POST() {
+function previewId(projectPath: string): string {
+  return crypto.createHash("md5").update(projectPath).digest("hex").slice(0, 12);
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const port = await fs.readFile(PORT_FILE, "utf-8").catch(() => null);
-    if (port) {
-      try {
-        process.kill(-Number(port));
-      } catch {}
-      await fs.unlink(PORT_FILE).catch(() => {});
+    const body = await request.json().catch(() => ({}));
+    const projectPath = body.projectPath;
+
+    if (projectPath) {
+      const id = previewId(projectPath);
+      const pf = path.join(PREVIEW_DIR, `${id}.pid`);
+      const pid = await fs.readFile(pf, "utf-8").catch(() => null);
+      if (pid) {
+        try { process.kill(Number(pid)); } catch {}
+        await fs.unlink(pf).catch(() => {});
+        await fs.unlink(path.join(PREVIEW_DIR, `${id}.port`)).catch(() => {});
+      }
+      return NextResponse.json({ success: true });
     }
+
+    const files = await fs.readdir(PREVIEW_DIR).catch(() => []);
+    for (const file of files) {
+      if (file.endsWith(".pid")) {
+        const pid = await fs.readFile(path.join(PREVIEW_DIR, file), "utf-8").catch(() => null);
+        if (pid) {
+          try { process.kill(Number(pid)); } catch {}
+        }
+        await fs.unlink(path.join(PREVIEW_DIR, file)).catch(() => {});
+        const portF = file.replace(".pid", ".port");
+        await fs.unlink(path.join(PREVIEW_DIR, portF)).catch(() => {});
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

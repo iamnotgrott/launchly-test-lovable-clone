@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FilePanel } from "@/components/files/FilePanel";
 import { ChatView } from "@/components/chat/ChatView";
 import { FileTabs } from "@/components/files/FileTabs";
@@ -10,10 +10,13 @@ import { PreviewFrame } from "@/components/preview/PreviewFrame";
 import { CheckpointPanel } from "@/components/files/CheckpointPanel";
 import { TerminalPanel } from "@/components/terminal/TerminalPanel";
 import { DiffViewer } from "@/components/diff/DiffViewer";
+import { ToastContainer } from "@/components/ui/ToastContainer";
 import { useProjectStore } from "@/store/projectStore";
 import { useCheckpointStore } from "@/store/checkpointStore";
 import { cn } from "@/lib/utils";
-import { PanelLeft, Monitor, Terminal, History, Settings } from "lucide-react";
+import { PanelLeft, Monitor, Terminal, History, Settings, LogOut } from "lucide-react";
+import { ModelSelector } from "@/components/layout/ModelSelector";
+import { useAuth } from "@/hooks/useAuth";
 
 type LeftPanel = "files" | "projects" | "history";
 type RightPanel = "editor" | "preview" | "terminal" | null;
@@ -26,6 +29,13 @@ export default function Home() {
   const activeFile = useProjectStore((s) => s.activeFile);
   const activeProject = useProjectStore((s) => s.activeProject);
   const diffView = useCheckpointStore((s) => s.diffView);
+  const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (activeFile && rightPanel !== "preview") {
+      setRightPanel("editor");
+    }
+  }, [activeFile]);
 
   const toggleRightPanel = (panel: RightPanel) => {
     setRightPanel((prev) => (prev === panel ? null : panel));
@@ -33,8 +43,8 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-100">
-      {/* Diff viewer overlay */}
       <DiffViewer />
+      <ToastContainer />
 
       {/* Left sidebar */}
       <div
@@ -102,6 +112,7 @@ export default function Home() {
             )}
           </div>
           <div className="flex items-center gap-1">
+            <ModelSelector />
             <a
               href="/settings"
               className="p-1.5 rounded-md transition-colors flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
@@ -109,6 +120,15 @@ export default function Home() {
             >
               <Settings size={14} />
             </a>
+            {user && (
+              <button
+                onClick={logout}
+                className="p-1.5 rounded-md transition-colors flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
+                title={`Sign out (${user.email})`}
+              >
+                <LogOut size={14} />
+              </button>
+            )}
             <button
               onClick={() => toggleRightPanel("preview")}
               className={cn(

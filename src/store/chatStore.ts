@@ -9,12 +9,15 @@ interface ChatStore extends ChatState {
   setPlanText: (plan: string | undefined) => void;
   setIsPlanning: (isPlanning: boolean) => void;
   clearChat: () => void;
+  pendingSuggestion: string | null;
+  setSuggestion: (text: string | null) => void;
 }
 
-const initialState: ChatState = {
+const initialState: ChatState & { pendingSuggestion: string | null } = {
   messages: [],
   isStreaming: false,
   isPlanning: false,
+  pendingSuggestion: null,
 };
 
 export const useChatStore = create<ChatStore>((set) => ({
@@ -48,4 +51,6 @@ export const useChatStore = create<ChatStore>((set) => ({
   setIsPlanning: (isPlanning) => set({ isPlanning }),
 
   clearChat: () => set(initialState),
+  pendingSuggestion: null,
+  setSuggestion: (text) => set({ pendingSuggestion: text }),
 }));

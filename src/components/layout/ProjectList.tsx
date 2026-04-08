@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useProjectStore } from "@/store/projectStore";
+import { usePersistence } from "@/hooks/PersistenceContext";
 import { Button } from "@/components/ui/Button";
 import { FolderPlus, Loader2 } from "lucide-react";
 
@@ -11,6 +12,7 @@ export function ProjectList() {
   const setActiveProject = useProjectStore((s) => s.setActiveProject);
   const setProjects = useProjectStore((s) => s.setProjects);
   const setFiles = useProjectStore((s) => s.setFiles);
+  const { persistProject } = usePersistence();
   const [isCreating, setIsCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
 
@@ -25,8 +27,15 @@ export function ProjectList() {
       });
       const data = await res.json();
       if (data.project) {
-        setProjects([...projects, data.project]);
-        setActiveProject(data.project);
+        const convexId = await persistProject({
+          name: data.project.name,
+          workspacePath: data.project.workspacePath,
+        });
+        const project = convexId
+          ? { ...data.project, id: convexId, _id: convexId }
+          : data.project;
+        setProjects([...projects, project]);
+        setActiveProject(project);
         setFiles(data.files || []);
         setNewProjectName("");
       }

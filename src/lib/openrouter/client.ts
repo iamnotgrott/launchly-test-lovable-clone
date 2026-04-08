@@ -12,6 +12,7 @@ export interface ChatCompletionOptions {
   stream?: boolean;
   onResponse?: (response: Response) => void;
   apiKey?: string;
+  onHeartbeat?: () => void;
 }
 
 interface OpenRouterUsage {
@@ -41,6 +42,10 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const FETCH_TIMEOUT_MS = 30000;
+const STREAM_READ_TIMEOUT_MS = 30000;
+const HEARTBEAT_INTERVAL_MS = 3000;
+
 export async function sendChatCompletion(
   messages: ChatMessage[],
   options: ChatCompletionOptions = {}
@@ -64,8 +69,12 @@ export async function sendChatCompletion(
       try {
         if (attempt > 0) {
           const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+          console.log(`[OpenRouter] Retry ${attempt} for ${tryModel}, waiting ${delay}ms`);
           await sleep(delay);
         }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
         const response = await fetch(OPENROUTER_API_URL, {
           method: "POST",
@@ -76,22 +85,33 @@ export async function sendChatCompletion(
             "X-Title": "Forge AI App Builder",
           },
           body: JSON.stringify({ ...body, model: tryModel }),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
+          if (response.status === 429) {
+            const retryAfter = response.headers.get("retry-after");
+            const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : 5000;
+            console.warn(`[OpenRouter] Rate limited. Waiting ${waitMs}ms...`);
+            await sleep(waitMs);
+            continue;
+          }
+          throw new Error(`OpenRouter API error (${response.status}): ${errorText.slice(0, 300)}`);
         }
 
         const data: OpenRouterResponse = await response.json();
+        const content = data.choices[0]?.message?.content || "";
+        console.log(`[OpenRouter] ${tryModel} returned ${content.length} chars`);
         return {
-          content: data.choices[0]?.message?.content || "",
+          content,
           model: data.model,
           usage: data.usage,
         };
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        console.warn(`Attempt ${attempt + 1} with model ${tryModel} failed:`, lastError.message);
+        console.warn(`[OpenRouter] Attempt ${attempt + 1} with ${tryModel} failed:`, lastError.message);
       }
     }
   }
@@ -106,6 +126,7 @@ export async function* streamChatCompletion(
   const model = options.model || MODELS.DEFAULT;
   const maxTokens = options.maxTokens || MODEL_CAPABILITIES[model].maxTokens;
   const apiKey = getApiKey(options.apiKey);
+  const onHeartbeat = options.onHeartbeat;
 
   const body = {
     model,
@@ -122,8 +143,14 @@ export async function* streamChatCompletion(
       try {
         if (attempt > 0) {
           const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+          console.log(`[OpenRouter] Stream retry ${attempt} for ${tryModel}, waiting ${delay}ms`);
           await sleep(delay);
         }
+
+        const controller = new AbortController();
+        const fetchTimeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+        console.log(`[OpenRouter] Streaming with ${tryModel}...`);
 
         const response = await fetch(OPENROUTER_API_URL, {
           method: "POST",
@@ -135,11 +162,20 @@ export async function* streamChatCompletion(
             Accept: "text/event-stream",
           },
           body: JSON.stringify({ ...body, model: tryModel }),
+          signal: controller.signal,
         });
+        clearTimeout(fetchTimeoutId);
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
+          if (response.status === 429) {
+            const retryAfter = response.headers.get("retry-after");
+            const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : 5000;
+            console.warn(`[OpenRouter] Rate limited. Waiting ${waitMs}ms...`);
+            await sleep(waitMs);
+            continue;
+          }
+          throw new Error(`OpenRouter API error (${response.status}): ${errorText.slice(0, 300)}`);
         }
 
         const reader = response.body?.getReader();
@@ -147,38 +183,64 @@ export async function* streamChatCompletion(
 
         const decoder = new TextDecoder();
         let buffer = "";
-        let fullContent = "";
+        let heartbeatInterval: NodeJS.Timeout | null = null;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        if (onHeartbeat) {
+          heartbeatInterval = setInterval(onHeartbeat, HEARTBEAT_INTERVAL_MS);
+        }
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
+        try {
+          while (true) {
+            const readPromise = reader.read();
+            const timeoutPromise = new Promise<ReadableStreamReadResult<Uint8Array>>((_, reject) => {
+              setTimeout(() => reject(new Error(`Stream read timeout after ${STREAM_READ_TIMEOUT_MS / 1000}s`)), STREAM_READ_TIMEOUT_MS);
+            });
 
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || trimmed === "data: [DONE]") continue;
-            if (!trimmed.startsWith("data: ")) continue;
+            const { done, value } = await Promise.race([readPromise, timeoutPromise]);
 
-            try {
-              const json = JSON.parse(trimmed.slice(6));
-              const delta = json.choices?.[0]?.delta?.content || "";
-              if (delta) {
-                fullContent += delta;
-                yield { content: delta, model: json.model || tryModel, done: false };
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || trimmed === "data: [DONE]") continue;
+              if (!trimmed.startsWith("data: ")) continue;
+
+              try {
+                const json = JSON.parse(trimmed.slice(6));
+
+                if (json.error) {
+                  throw new Error(`OpenRouter error: ${json.error.message || JSON.stringify(json.error)}`);
+                }
+
+                const delta = json.choices?.[0]?.delta?.content || "";
+                if (delta) {
+                  yield { content: delta, model: json.model || tryModel, done: false };
+                }
+
+                if (json.choices?.[0]?.finish_reason) {
+                  yield { content: "", model: json.model || tryModel, done: true };
+                  return;
+                }
+              } catch (parseError) {
+                if (parseError instanceof Error && parseError.message.startsWith("OpenRouter error")) {
+                  throw parseError;
+                }
               }
-            } catch {
-              // skip malformed SSE events
             }
           }
+        } finally {
+          if (heartbeatInterval) clearInterval(heartbeatInterval);
         }
 
         yield { content: "", model: tryModel, done: true };
         return;
       } catch (error) {
-        console.warn(`Stream attempt ${attempt + 1} with model ${tryModel} failed:`, error);
+        const errMsg = error instanceof Error ? error.message : String(error);
+        console.warn(`[OpenRouter] Stream attempt ${attempt + 1} with ${tryModel} failed: ${errMsg}`);
       }
     }
   }

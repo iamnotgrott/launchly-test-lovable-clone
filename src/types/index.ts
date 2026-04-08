@@ -13,6 +13,7 @@ export interface Message {
 
 export interface Project {
   id: string;
+  _id?: string;
   name: string;
   description?: string;
   workspacePath: string;

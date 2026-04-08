@@ -1,12 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useCallback } from "react";
 import { MessageList } from "./MessageList";
 import { Composer } from "./Composer";
 import { useChatStore } from "@/store/chatStore";
 
 export function ChatView() {
   const clearChat = useChatStore((s) => s.clearChat);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleMessageSent = useCallback(() => {
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    });
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -19,8 +26,8 @@ export function ChatView() {
           Clear
         </button>
       </div>
-      <MessageList />
-      <Composer onMessageSent={() => {}} />
+      <MessageList scrollRef={scrollRef} />
+      <Composer onMessageSent={handleMessageSent} />
     </div>
   );
 }

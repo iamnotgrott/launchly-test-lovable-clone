@@ -93,9 +93,17 @@ const encoder = new TextEncoder();
 export async function POST(request: NextRequest) {
   const { workspacePath, userMessage, chatHistory } = await request.json();
   const apiKey = request.headers.get("x-openrouter-key") || undefined;
+  const preferredModel = (request.headers.get("x-openrouter-model") || undefined) as import("@/lib/openrouter").ModelId | undefined;
 
   if (!workspacePath || !userMessage) {
     return NextResponse.json({ error: "workspacePath and userMessage are required" }, { status: 400 });
+  }
+
+  if (!apiKey && !process.env.OPENROUTER_API_KEY) {
+    return NextResponse.json(
+      { error: "No API key provided. Set one in Settings or add OPENROUTER_API_KEY to .env.local." },
+      { status: 401 }
+    );
   }
 
   const stream = new TransformStream();
@@ -118,7 +126,7 @@ export async function POST(request: NextRequest) {
         { role: "user", content: buildPlanningPrompt(userMessage, filePaths) },
       ];
 
-      const planResponse = await sendChatCompletion(planMessages, { model: selectModelForTask("planning"), apiKey });
+      const planResponse = await sendChatCompletion(planMessages, { model: selectModelForTask("planning", preferredModel), apiKey });
       await writeSSE({ type: "plan_complete", content: planResponse.content });
 
       await writeSSE({ type: "checkpoint_start" });
@@ -140,24 +148,69 @@ export async function POST(request: NextRequest) {
       let totalPromptTokens = 0;
       let totalCompletionTokens = 0;
 
-      for await (const chunk of streamChatCompletion(editMessages, { model: selectModelForTask("code-generation"), apiKey })) {
-        if (chunk.done) {
-          if (chunk.usage) {
-            totalPromptTokens += chunk.usage.prompt_tokens;
-            totalCompletionTokens += chunk.usage.completion_tokens;
+      try {
+        for await (const chunk of streamChatCompletion(editMessages, {
+          model: selectModelForTask("code-generation", preferredModel),
+          apiKey,
+          onHeartbeat: async () => {
+            await writeSSE({ type: "heartbeat" });
+          },
+        })) {
+          if (chunk.done) {
+            if (chunk.usage) {
+              totalPromptTokens += chunk.usage.prompt_tokens;
+              totalCompletionTokens += chunk.usage.completion_tokens;
+            }
+            break;
           }
-          break;
+          fullContent += chunk.content;
+          modelUsed = chunk.model;
+          await writeSSE({ type: "stream", content: chunk.content });
         }
-        fullContent += chunk.content;
-        modelUsed = chunk.model;
-        await writeSSE({ type: "stream", content: chunk.content });
+      } catch (streamError) {
+        const streamErrorMsg = streamError instanceof Error ? streamError.message : "Streaming failed";
+        console.error("[Turn Execute] Stream error:", streamErrorMsg);
+        await writeSSE({ type: "stream_error", message: streamErrorMsg });
+
+        try {
+          const response = await sendChatCompletion(editMessages, { model: selectModelForTask("code-generation", preferredModel), apiKey });
+          fullContent = response.content;
+          modelUsed = response.model;
+          if (response.usage) {
+            totalPromptTokens += response.usage.prompt_tokens;
+            totalCompletionTokens += response.usage.completion_tokens;
+          }
+          await writeSSE({ type: "stream", content: fullContent });
+        } catch (fallbackError) {
+          const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : "Fallback also failed";
+          console.error("[Turn Execute] Fallback error:", fallbackMsg);
+          await writeSSE({
+            type: "failed",
+            errorMessage: `AI request failed: ${streamErrorMsg}. Fallback: ${fallbackMsg}`,
+            filesChanged: [],
+            model: modelUsed || "unknown",
+            retryCount: 0,
+          });
+          return;
+        }
+      }
+
+      if (!fullContent.trim()) {
+        await writeSSE({
+          type: "failed",
+          errorMessage: "AI returned empty response. Please try again.",
+          filesChanged: [],
+          model: modelUsed,
+          retryCount: 0,
+        });
+        return;
       }
 
       const applyResult = await applyFileBlocks(workspacePath, fullContent);
 
       if (!applyResult.success && applyResult.error) {
         await writeSSE({ type: "error", message: applyResult.error });
-        const repairResult = await attemptRepair(workspacePath, applyResult.error, apiKey);
+        const repairResult = await attemptRepair(workspacePath, applyResult.error, apiKey, preferredModel);
         if (repairResult.success) {
           await writeSSE({
             type: "complete",
@@ -184,7 +237,7 @@ export async function POST(request: NextRequest) {
 
         if (!buildResult.success) {
           await writeSSE({ type: "build_error", message: buildResult.error });
-          const repairResult = await attemptRepair(workspacePath, buildResult.error, apiKey);
+          const repairResult = await attemptRepair(workspacePath, buildResult.error, apiKey, preferredModel);
           if (repairResult.success) {
             const postCheckpoint = await captureCheckpoint(workspacePath, Date.now());
             await writeSSE({
@@ -252,6 +305,14 @@ async function applyFileBlocks(workspacePath: string, content: string) {
           filesChanged.push({ path: block.path, action: "deleted", additions: 0, deletions: 0 });
         }
       } else {
+        if (!block.content || block.content.trim().length === 0) {
+          errors.push(`Skipping ${block.path}: empty content`);
+          continue;
+        }
+        if (block.path.includes("..") || block.path.startsWith("/")) {
+          errors.push(`Skipping ${block.path}: invalid path`);
+          continue;
+        }
         const existed = await fileExists(fullPath);
         const oldContent = existed ? await safeReadFile(fullPath) : "";
         await safeWriteFile(fullPath, block.content);
@@ -272,7 +333,7 @@ async function applyFileBlocks(workspacePath: string, content: string) {
   return { success: errors.length === 0, filesChanged, summary, error: errors.length > 0 ? errors.join("\n") : undefined };
 }
 
-async function attemptRepair(workspacePath: string, errorMessage: string, apiKey?: string) {
+async function attemptRepair(workspacePath: string, errorMessage: string, apiKey?: string, preferredModel?: import("@/lib/openrouter").ModelId) {
   let retryCount = 0;
   let lastError = errorMessage;
 
@@ -285,7 +346,7 @@ async function attemptRepair(workspacePath: string, errorMessage: string, apiKey
     ];
 
     let repairContent = "";
-    for await (const chunk of streamChatCompletion(repairMessages, { model: selectModelForTask("error-repair"), apiKey })) {
+    for await (const chunk of streamChatCompletion(repairMessages, { model: selectModelForTask("error-repair", preferredModel), apiKey })) {
       if (chunk.done) break;
       repairContent += chunk.content;
     }

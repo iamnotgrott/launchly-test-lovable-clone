@@ -12,22 +12,24 @@ Build web applications through natural language conversation. Describe what you 
 - **Terminal** — Run commands, see build output (xterm.js with WebGL)
 - **Checkpoints & rollback** — Git-based version history, revert to any turn
 - **Build error repair** — Automatic build detection, error summary, and AI repair loop
-- **Model routing** — Smart model selection (fast for simple tasks, powerful for complex ones)
+- **Model routing** — Smart model selection (Nemotron 120B default, with user-selectable alternatives)
 - **Retry & fallback** — Automatic retry with model fallback on errors
 - **Token usage logging** — Track prompt/completion tokens per turn
 - **Settings page** — API key management, model info, data controls
+- **Persistence** — Convex backend for projects, messages, turns, and checkpoints
+- **Auth** — Better Auth (email/password) ready for deployment
 
 ## Tech Stack
 
 - **Frontend**: Next.js App Router + React + TypeScript
 - **Styling**: Tailwind CSS v4
-- **State**: Zustand
-- **LLM**: OpenRouter API (qwen/qwen3.6-plus:free, stepfun/step-3.5-flash:free, nvidia/nemotron-3-super-120b-a12b:free)
+- **State**: Zustand (client UI state) + Convex (server persistence)
+- **LLM**: OpenRouter API (nvidia/nemotron-3-super-120b-a12b:free default, with fallbacks)
 - **Preview**: Vite dev server spawned locally
 - **Terminal**: xterm.js with WebGL renderer
 - **Version control**: simple-git for checkpoint management
-- **Auth**: Better Auth (email/password, session management)
-- **DB**: Convex schema ready (requires deployment)
+- **Auth**: Better Auth (ready for email/password)
+- **DB**: Convex (deployed via `npx convex dev`)
 
 ## Quick Start
 
@@ -40,19 +42,30 @@ Build web applications through natural language conversation. Describe what you 
    ```bash
    cp .env.example .env.local
    ```
-   Add your OpenRouter API key and auth secret to `.env.local`:
+   Add your OpenRouter API key to `.env.local`:
    ```
    OPENROUTER_API_KEY=your-key-here
-   BETTER_AUTH_SECRET=$(openssl rand -base64 32)
-   BETTER_AUTH_URL=http://localhost:3000
    ```
 
-3. **Run the development server**
+3. **Start development servers**
    ```bash
    npm run dev
    ```
+   This starts two processes:
+   - Next.js dev server (http://localhost:3000)
+   - Convex dev server (deploys schema and provides real-time backend)
 
-4. **Open** [http://localhost:3000](http://localhost:3000)
+4. **Wait for Convex deployment** — The first time you run `npm run dev`, you'll see Convex output like:
+   ```
+   ✓ Your project is deployed at: https://your-project.convex.cloud
+   ```
+   Copy that URL and add it to `.env.local`:
+   ```
+   NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
+   ```
+   Then restart `npm run dev`.
+
+5. **Open** [http://localhost:3000](http://localhost:3000)
 
 ## Architecture
 
@@ -69,20 +82,22 @@ src/
 │   │   ├── terminal/run          # Command execution with SSE output
 │   │   ├── preview/              # Vite dev server start/stop
 │   │   └── auth/[...all]/        # Better Auth handler
-├── components/
-│   ├── chat/                     # ChatView, MessageList, MessageBubble, Composer
+├── components/                   # React components
+│   ├── chat/                     # ChatUI (messages, composer)
 │   ├── files/                    # FileTree, FilePanel, FileTabs, FileEditor, CheckpointPanel
 │   ├── diff/                     # DiffViewer (expandable file diffs)
 │   ├── terminal/                 # TerminalPanel (xterm.js)
 │   ├── preview/                  # PreviewFrame (sandboxed iframe)
-│   ├── layout/                   # Sidebar, ProjectList
-│   └── ui/                       # Button, Card
+│   ├── layout/                   # Sidebar, ProjectList, ModelSelector
+│   └── ui/                       # UI primitives (Button, Card, Toast, Skeleton)
 ├── lib/
-│   ├── openrouter/               # Provider: config, client, model router
-│   └── filesystem/               # Server: manager, validator, diff utils
+│   ├── openrouter/               # OpenRouter provider (config, client, model router)
+│   ├── filesystem/               # File operations (manager, validator, diff)
+│   └── convex/                   # Convex client wrapper
 ├── prompts/                      # system, project-creation, code-edit, error-repair, planning
-├── store/                        # chatStore, projectStore, checkpointStore
-└── types/                        # Shared TypeScript types
+├── store/                        # chatStore, projectStore, checkpointStore, toastStore
+├── types/                        # Shared TypeScript types
+└── convex/                       # Convex schema
 ```
 
 ## How It Works
@@ -90,69 +105,60 @@ src/
 1. **Create a project** — Enter a name in the Projects panel
 2. **Describe your app** — Type a prompt in the chat
 3. **AI plans and executes** — The system:
-   - Plans the changes (fast model)
+   - Plans the changes (using selected model)
    - Creates a git checkpoint before changes
-   - Generates/edits files (default model, streamed)
+   - Generates/edits files (streamed or fallback)
    - Runs `vite build` to verify
-   - Auto-repairs build errors (fallback model, max 3 retries)
+   - Auto-repairs build errors (max 3 retries)
    - Creates a post-change git checkpoint
    - Logs token usage
+   - Persists all changes to Convex
 4. **Preview** — Click Preview to spawn Vite dev server in iframe
 5. **Terminal** — Click Terminal to run any command with xterm.js output
 6. **History** — View checkpoints, see diffs, revert to any previous state
-7. **Iterate** — Continue refining through chat
+7. **Iterate** — Continue refining through chat; all data persists across refreshes
 
-## Model Routing
+## Model Selection
 
-| Task | Model | Purpose |
-|------|-------|---------|
-| Planning | stepfun/step-3.5-flash:free | Fast, cheap |
-| Code Generation | qwen/qwen3.6-plus:free | Default, balanced |
-| Error Repair | nvidia/nemotron-3-super-120b-a12b:free | Heavy reasoning |
+Use the ⚡ Model Selector in the top bar to choose:
+- **Nemotron 120B** (default) — Most reliable free model
+- **Qwen 3.6 Plus** — Faster but rate limited
+- **Step 3.5 Flash** — Fastest, least reliable
 
-## Turn Lifecycle
+Your selection persists in localStorage.
 
+## Persistence
+
+All data is stored in Convex:
+- **Projects** — name, description, workspace path
+- **Messages** — chat history with token usage
+- **Turns** — each AI turn with files changed, status, errors
+- **Checkpoints** — git-based version history for rollback
+
+## Quick Start (Detailed)
+
+```bash
+# 1. Install
+npm install
+
+# 2. Set API key
+echo "OPENROUTER_API_KEY=your-key-here" > .env.local
+
+# 3. Start dev (this will show your Convex URL)
+npm run dev
+
+# 4. In another terminal, watch for:
+#    ✓ Your project is deployed at: https://abc123.convex.cloud
+#    Copy that URL
+
+# 5. Stop dev (Ctrl+C), then add to .env.local:
+echo "NEXT_PUBLIC_CONVEX_URL=https://abc123.convex.cloud" >> .env.local
+
+# 6. Restart dev
+npm run dev
+
+# 7. Open http://localhost:3000
 ```
-User prompt
-  → Plan (FAST model)
-  → Pre-change checkpoint (git)
-  → Generate code (DEFAULT model, streamed)
-  → Apply file changes
-  → Run vite build
-  → If build fails:
-      → Repair attempt (FALLBACK model)
-      → Retry build (max 3 times)
-  → Post-change checkpoint (git)
-  → Log token usage
-  → Stream result to client
-```
-
-## Security
-
-- Path validation prevents directory traversal
-- File operations restricted to project workspace
-- No secrets exposed in frontend (API key in env, not client)
-- Preview runs in sandboxed iframe
-- Shell commands executed with explicit cwd restriction
-
-## Tradeoffs & Known Issues
-
-- **In-memory state**: Chat/project state is in Zustand. Refreshing loses state. Convex schema is ready but requires deployment.
-- **Auth not enforced**: Better Auth is set up but the workspace page doesn't require login yet.
-- **No cloud deployment**: Preview runs on localhost only.
-- **File parsing**: AI file changes parsed from markdown code blocks. Edge cases possible.
-- **Sequential turns**: Only one turn can execute at a time (no parallel turns).
-
-## Next Improvements
-
-1. Deploy Convex and wire up persistence
-2. Enforce authentication on workspace
-3. Add project templates (React, Next.js, Vue, etc.)
-4. Add multi-file diff summary in chat
-5. Improve file parsing with structured JSON output
-6. Add usage dashboard (token costs, model breakdown)
-7. Add keyboard shortcuts (Cmd+K command palette)
-8. Add dark/light theme toggle
 
 ## License
 

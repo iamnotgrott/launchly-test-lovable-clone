@@ -1,30 +1,23 @@
-export type TaskType =
-  | "title"
-  | "summary"
-  | "classification"
-  | "chat"
-  | "code-generation"
-  | "heavy-reasoning"
-  | "large-refactor"
-  | "error-repair"
-  | "planning";
-
 import { MODELS, ModelId } from "./config";
 
-export function selectModelForTask(task: TaskType): ModelId {
-  switch (task) {
-    case "title":
-    case "summary":
-    case "classification":
-      return MODELS.FAST;
-    case "heavy-reasoning":
-    case "large-refactor":
-    case "error-repair":
-      return MODELS.FALLBACK;
-    case "planning":
-    case "chat":
-    case "code-generation":
-    default:
-      return MODELS.DEFAULT;
+export type TaskType =
+  | "planning"
+  | "code-generation"
+  | "error-repair"
+  | "title"
+  | "summary";
+
+const TASK_MODEL_MAP: Record<TaskType, ModelId> = {
+  "planning": MODELS.FAST,
+  "code-generation": MODELS.DEFAULT,
+  "error-repair": MODELS.DEFAULT,
+  "title": MODELS.FAST,
+  "summary": MODELS.FAST,
+};
+
+export function selectModelForTask(task: TaskType, preferredModel?: ModelId): ModelId {
+  if (preferredModel && preferredModel !== MODELS.DEFAULT) {
+    return preferredModel;
   }
+  return TASK_MODEL_MAP[task] ?? MODELS.DEFAULT;
 }
