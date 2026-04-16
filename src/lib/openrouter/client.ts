@@ -62,7 +62,7 @@ export async function sendChatCompletion(
   };
 
   let lastError: Error | null = null;
-  const modelsToTry = [model, MODELS.FALLBACK].filter((m, i, arr) => arr.indexOf(m) === i);
+  const modelsToTry = [model];
 
   for (const tryModel of modelsToTry) {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -136,7 +136,7 @@ export async function* streamChatCompletion(
     stream: true,
   };
 
-  const modelsToTry = [model, MODELS.FALLBACK].filter((m, i, arr) => arr.indexOf(m) === i);
+  const modelsToTry = [model];
 
   for (const tryModel of modelsToTry) {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {

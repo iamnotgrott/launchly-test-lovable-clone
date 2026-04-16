@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs/promises";
 import http from "http";
 import crypto from "crypto";
+import { ensureDependenciesInstalled, ensureStarterProject } from "@/lib/projects/starter";
 
 const PREVIEW_DIR = path.join(process.env.HOME || "/tmp", ".ai-app-builder", "previews");
 
@@ -66,6 +67,19 @@ export async function POST(request: NextRequest) {
 
     const id = previewId(projectPath);
     await fs.mkdir(PREVIEW_DIR, { recursive: true });
+    const scaffold = await ensureStarterProject(projectPath);
+    const install = await ensureDependenciesInstalled(projectPath);
+
+    if (!install.success) {
+      return NextResponse.json({
+        error: `Dependencies failed to install. ${install.error || install.output.slice(-500)}`,
+        setup: { scaffolded: scaffold.scaffolded, installed: false, installRan: install.installed },
+      });
+    }
+
+    if (install.installed) {
+      await killExisting(id);
+    }
 
     const existingPort = await fs.readFile(portFile(id), "utf-8").catch(() => null);
     const existingPid = await fs.readFile(pidFile(id), "utf-8").catch(() => null);
@@ -76,26 +90,6 @@ export async function POST(request: NextRequest) {
       } catch {
         await killExisting(id);
       }
-    }
-
-    const hasPackageJson = await fs
-      .access(path.join(projectPath, "package.json"))
-      .then(() => true)
-      .catch(() => false);
-
-    if (!hasPackageJson) {
-      return NextResponse.json({ error: "No package.json found. Generate a project first." });
-    }
-
-    const hasNodeModules = await fs
-      .access(path.join(projectPath, "node_modules"))
-      .then(() => true)
-      .catch(() => false);
-
-    if (!hasNodeModules) {
-      return NextResponse.json({
-        error: "Dependencies not installed. Run 'npm install' in the project directory first.",
-      });
     }
 
     const port = 5173 + Math.floor(Math.random() * 1000);
@@ -131,7 +125,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ port, pid: devProcess.pid });
+    return NextResponse.json({
+      port,
+      pid: devProcess.pid,
+      setup: { scaffolded: scaffold.scaffolded, installed: true, installRan: install.installed },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to start preview" },

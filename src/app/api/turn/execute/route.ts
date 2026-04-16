@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendChatCompletion, streamChatCompletion, ChatMessage, selectModelForTask, MODELS } from "@/lib/openrouter";
+import { sendChatCompletion, streamChatCompletion, ChatMessage, selectModelForTask } from "@/lib/openrouter";
 import { parseFileBlocks, generateDiff } from "@/lib/filesystem/diff";
 import { validatePath } from "@/lib/filesystem/validator";
 import { buildPlanningPrompt } from "@/prompts/planning";
 import { buildCodeEditPrompt } from "@/prompts/code-edit";
 import { buildErrorRepairPrompt } from "@/prompts/error-repair";
 import { SYSTEM_PROMPT } from "@/prompts/system";
+import { ensureDependenciesInstalled, ensureStarterProject } from "@/lib/projects/starter";
 import fs from "fs/promises";
 import path from "path";
 import simpleGit from "simple-git";
@@ -55,37 +56,33 @@ async function readAllFiles(basePath: string): Promise<Array<{ path: string; con
   return files;
 }
 
-async function safeWriteFile(filePath: string, content: string): Promise<void> {
-  const validation = validatePath(filePath);
+async function safeWriteFile(workspacePath: string, relativePath: string, content: string): Promise<void> {
+  const validation = validatePath(relativePath);
   if (!validation.valid) throw new Error(validation.error);
-  const dir = path.dirname(filePath);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(filePath, content, "utf-8");
+  const fullPath = path.join(workspacePath, relativePath);
+  await fs.mkdir(path.dirname(fullPath), { recursive: true });
+  await fs.writeFile(fullPath, content, "utf-8");
 }
 
-async function safeReadFile(filePath: string): Promise<string> {
-  const validation = validatePath(filePath);
+async function safeReadFile(workspacePath: string, relativePath: string): Promise<string> {
+  const validation = validatePath(relativePath);
   if (!validation.valid) throw new Error(validation.error);
-  return fs.readFile(filePath, "utf-8");
+  return fs.readFile(path.join(workspacePath, relativePath), "utf-8");
 }
 
-async function fileExists(filePath: string): Promise<boolean> {
+async function fileExists(fullPath: string): Promise<boolean> {
   try {
-    await fs.access(filePath);
+    await fs.access(fullPath);
     return true;
   } catch {
     return false;
   }
 }
 
-async function safeDeleteFile(filePath: string): Promise<void> {
-  const validation = validatePath(filePath);
+async function safeDeleteFile(workspacePath: string, relativePath: string): Promise<void> {
+  const validation = validatePath(relativePath);
   if (!validation.valid) throw new Error(validation.error);
-  await fs.unlink(filePath);
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  await fs.unlink(path.join(workspacePath, relativePath));
 }
 
 const encoder = new TextEncoder();
@@ -93,7 +90,6 @@ const encoder = new TextEncoder();
 export async function POST(request: NextRequest) {
   const { workspacePath, userMessage, chatHistory } = await request.json();
   const apiKey = request.headers.get("x-openrouter-key") || undefined;
-  const preferredModel = (request.headers.get("x-openrouter-model") || undefined) as import("@/lib/openrouter").ModelId | undefined;
 
   if (!workspacePath || !userMessage) {
     return NextResponse.json({ error: "workspacePath and userMessage are required" }, { status: 400 });
@@ -115,6 +111,30 @@ export async function POST(request: NextRequest) {
 
   (async () => {
     try {
+      await writeSSE({ type: "setup_start" });
+      const scaffold = await ensureStarterProject(workspacePath);
+      const initialInstall = await ensureDependenciesInstalled(workspacePath);
+      if (!initialInstall.success) {
+        await writeSSE({
+          type: "failed",
+          errorMessage: `Dependencies failed to install. ${initialInstall.error || initialInstall.output.slice(-500)}`,
+          filesChanged: scaffold.filesCreated.map((filePath) => ({
+            path: filePath,
+            action: "created",
+            additions: 0,
+            deletions: 0,
+          })),
+          model: "none",
+          retryCount: 0,
+        });
+        return;
+      }
+      await writeSSE({
+        type: "setup_complete",
+        scaffolded: scaffold.scaffolded,
+        dependenciesInstalled: initialInstall.installed,
+      });
+
       const files = await readAllFiles(workspacePath);
       const filePaths = files.map((f) => f.path);
 
@@ -126,7 +146,7 @@ export async function POST(request: NextRequest) {
         { role: "user", content: buildPlanningPrompt(userMessage, filePaths) },
       ];
 
-      const planResponse = await sendChatCompletion(planMessages, { model: selectModelForTask("planning", preferredModel), apiKey });
+      const planResponse = await sendChatCompletion(planMessages, { model: selectModelForTask("planning"), apiKey });
       await writeSSE({ type: "plan_complete", content: planResponse.content });
 
       await writeSSE({ type: "checkpoint_start" });
@@ -150,7 +170,7 @@ export async function POST(request: NextRequest) {
 
       try {
         for await (const chunk of streamChatCompletion(editMessages, {
-          model: selectModelForTask("code-generation", preferredModel),
+          model: selectModelForTask("code-generation"),
           apiKey,
           onHeartbeat: async () => {
             await writeSSE({ type: "heartbeat" });
@@ -173,7 +193,7 @@ export async function POST(request: NextRequest) {
         await writeSSE({ type: "stream_error", message: streamErrorMsg });
 
         try {
-          const response = await sendChatCompletion(editMessages, { model: selectModelForTask("code-generation", preferredModel), apiKey });
+          const response = await sendChatCompletion(editMessages, { model: selectModelForTask("code-generation"), apiKey });
           fullContent = response.content;
           modelUsed = response.model;
           if (response.usage) {
@@ -210,7 +230,7 @@ export async function POST(request: NextRequest) {
 
       if (!applyResult.success && applyResult.error) {
         await writeSSE({ type: "error", message: applyResult.error });
-        const repairResult = await attemptRepair(workspacePath, applyResult.error, apiKey, preferredModel);
+        const repairResult = await attemptRepair(workspacePath, applyResult.error, apiKey);
         if (repairResult.success) {
           await writeSSE({
             type: "complete",
@@ -232,12 +252,26 @@ export async function POST(request: NextRequest) {
           });
         }
       } else {
+        const installResult = await ensureDependenciesInstalled(workspacePath);
+        if (!installResult.success) {
+          await writeSSE({
+            type: "failed",
+            filesChanged: applyResult.filesChanged,
+            model: modelUsed,
+            retryCount: 0,
+            errorMessage: `Dependencies failed to install: ${installResult.error || installResult.output.slice(-500)}`,
+            summary: applyResult.summary,
+            tokenUsage: { prompt: totalPromptTokens, completion: totalCompletionTokens },
+          });
+          return;
+        }
+
         await writeSSE({ type: "build_start" });
         const buildResult = await runBuild(workspacePath);
 
         if (!buildResult.success) {
           await writeSSE({ type: "build_error", message: buildResult.error });
-          const repairResult = await attemptRepair(workspacePath, buildResult.error, apiKey, preferredModel);
+          const repairResult = await attemptRepair(workspacePath, buildResult.error, apiKey);
           if (repairResult.success) {
             const postCheckpoint = await captureCheckpoint(workspacePath, Date.now());
             await writeSSE({
@@ -296,12 +330,28 @@ async function applyFileBlocks(workspacePath: string, content: string) {
   const filesChanged: Array<{ path: string; action: string; additions: number; deletions: number }> = [];
   const errors: string[] = [];
 
+  if (blocks.length === 0) {
+    return {
+      success: false,
+      filesChanged,
+      summary: "0 created, 0 modified, 0 deleted",
+      error: "No file changes were returned. The response must include at least one ```file: path``` block.",
+    };
+  }
+
   for (const block of blocks) {
-    const fullPath = path.join(workspacePath, block.path);
     try {
+      const validation = validatePath(block.path);
+      if (!validation.valid) {
+        errors.push(`Skipping ${block.path}: ${validation.error}`);
+        continue;
+      }
+
+      const fullPath = path.join(workspacePath, block.path);
+
       if (block.action === "delete") {
         if (await fileExists(fullPath)) {
-          await safeDeleteFile(fullPath);
+          await safeDeleteFile(workspacePath, block.path);
           filesChanged.push({ path: block.path, action: "deleted", additions: 0, deletions: 0 });
         }
       } else {
@@ -309,13 +359,9 @@ async function applyFileBlocks(workspacePath: string, content: string) {
           errors.push(`Skipping ${block.path}: empty content`);
           continue;
         }
-        if (block.path.includes("..") || block.path.startsWith("/")) {
-          errors.push(`Skipping ${block.path}: invalid path`);
-          continue;
-        }
         const existed = await fileExists(fullPath);
-        const oldContent = existed ? await safeReadFile(fullPath) : "";
-        await safeWriteFile(fullPath, block.content);
+        const oldContent = existed ? await safeReadFile(workspacePath, block.path) : "";
+        await safeWriteFile(workspacePath, block.path, block.content);
         const diff = generateDiff(block.path, oldContent, block.content);
         filesChanged.push({
           path: block.path,
@@ -333,7 +379,7 @@ async function applyFileBlocks(workspacePath: string, content: string) {
   return { success: errors.length === 0, filesChanged, summary, error: errors.length > 0 ? errors.join("\n") : undefined };
 }
 
-async function attemptRepair(workspacePath: string, errorMessage: string, apiKey?: string, preferredModel?: import("@/lib/openrouter").ModelId) {
+async function attemptRepair(workspacePath: string, errorMessage: string, apiKey?: string) {
   let retryCount = 0;
   let lastError = errorMessage;
 
@@ -346,13 +392,25 @@ async function attemptRepair(workspacePath: string, errorMessage: string, apiKey
     ];
 
     let repairContent = "";
-    for await (const chunk of streamChatCompletion(repairMessages, { model: selectModelForTask("error-repair", preferredModel), apiKey })) {
+    for await (const chunk of streamChatCompletion(repairMessages, { model: selectModelForTask("error-repair"), apiKey })) {
       if (chunk.done) break;
       repairContent += chunk.content;
     }
 
     const result = await applyFileBlocks(workspacePath, repairContent);
     if (result.success) {
+      const installResult = await ensureDependenciesInstalled(workspacePath);
+      if (!installResult.success) {
+        lastError = `Dependencies failed to install: ${installResult.error || installResult.output.slice(-500)}`;
+        continue;
+      }
+
+      const buildResult = await runBuild(workspacePath);
+      if (!buildResult.success) {
+        lastError = buildResult.error || buildResult.output || "Build failed after repair";
+        continue;
+      }
+
       return { success: true, filesChanged: result.filesChanged, retryCount };
     }
     lastError = result.error || "Unknown error during repair";
@@ -388,18 +446,38 @@ async function captureCheckpoint(workspacePath: string, turnCount: number): Prom
   }
 }
 
+async function detectBuildCommand(workspacePath: string): Promise<{ cmd: string; args: string[] }> {
+  try {
+    const pkgRaw = await fs.readFile(path.join(workspacePath, "package.json"), "utf-8");
+    const pkg = JSON.parse(pkgRaw);
+    if (pkg.scripts?.build) {
+      return { cmd: "npm", args: ["run", "build"] };
+    }
+  } catch {}
+
+  const hasViteConfig = await fileExists(path.join(workspacePath, "vite.config.ts"))
+    || await fileExists(path.join(workspacePath, "vite.config.js"));
+  if (hasViteConfig) {
+    return { cmd: "npx", args: ["vite", "build"] };
+  }
+
+  return { cmd: "npx", args: ["tsc", "--noEmit"] };
+}
+
 async function runBuild(workspacePath: string): Promise<{ success: boolean; output: string; error: string }> {
+  const { cmd, args } = await detectBuildCommand(workspacePath);
+
   return new Promise((resolve) => {
     let stdout = "";
     let stderr = "";
 
-    const proc = spawn("npx", ["vite", "build"], { cwd: workspacePath, shell: true });
+    const proc = spawn(cmd, args, { cwd: workspacePath, shell: true });
 
     proc.stdout.on("data", (data) => { stdout += data.toString(); });
     proc.stderr.on("data", (data) => { stderr += data.toString(); });
 
     proc.on("close", (code) => {
-      resolve({ success: code === 0, output: stdout, error: stderr });
+      resolve({ success: code === 0, output: stdout, error: stderr || stdout });
     });
 
     proc.on("error", (err) => {

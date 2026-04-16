@@ -10,9 +10,10 @@ import { usePersistence } from "@/hooks/PersistenceContext";
 
 interface ComposerProps {
   onMessageSent: () => void;
+  onTurnComplete?: () => void;
 }
 
-export function Composer({ onMessageSent }: ComposerProps) {
+export function Composer({ onMessageSent, onTurnComplete }: ComposerProps) {
   const [input, setInput] = useState("");
   const isStreaming = useChatStore((s) => s.isStreaming);
   const addMessage = useChatStore((s) => s.addMessage);
@@ -95,13 +96,11 @@ export function Composer({ onMessageSent }: ComposerProps) {
       .messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
     try {
-      const selectedModel = localStorage.getItem("forge_model") || "";
       const response = await fetch("/api/turn/execute", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-OpenRouter-Key": apiKey,
-          "X-OpenRouter-Model": selectedModel,
         },
         body: JSON.stringify({
           workspacePath: activeProject.workspacePath,
@@ -189,6 +188,7 @@ export function Composer({ onMessageSent }: ComposerProps) {
                 refreshFiles();
                 addToast("Changes applied successfully", "success");
                 onMessageSent();
+                onTurnComplete?.();
                 break;
               }
               case "failed": {
@@ -220,6 +220,14 @@ export function Composer({ onMessageSent }: ComposerProps) {
                 updateStreamingMessage(turnId, `Plan:\n${data.content}\n\nExecuting...\n\n`, false);
                 break;
               case "execute_start":
+                break;
+              case "setup_start":
+                updateStreamingMessage(turnId, "Preparing project...\n", false);
+                break;
+              case "setup_complete":
+                if (data.scaffolded || data.dependenciesInstalled) {
+                  updateStreamingMessage(turnId, "Project ready.\n", false);
+                }
                 break;
               case "error":
                 updateStreamingMessage(turnId, `\n\nError: ${data.message}\n`, false);

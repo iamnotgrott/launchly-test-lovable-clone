@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
+import { listFiles } from "@/lib/filesystem/manager";
+import { ensureDependenciesInstalled, ensureStarterProject } from "@/lib/projects/starter";
 
 const PROJECTS_DIR = path.join(process.env.HOME || "/tmp", ".ai-app-builder", "projects");
 
@@ -14,6 +16,9 @@ export async function POST(request: NextRequest) {
     const id = crypto.randomUUID().slice(0, 8);
     const workspacePath = path.join(PROJECTS_DIR, id);
     await fs.mkdir(workspacePath, { recursive: true });
+    const scaffold = await ensureStarterProject(workspacePath);
+    const install = await ensureDependenciesInstalled(workspacePath);
+    const files = await listFiles(workspacePath);
 
     const project = {
       id,
@@ -23,7 +28,16 @@ export async function POST(request: NextRequest) {
       updatedAt: Date.now(),
     };
 
-    return NextResponse.json({ project, files: [] });
+    return NextResponse.json({
+      project,
+      files,
+      setup: {
+        scaffolded: scaffold.scaffolded,
+        installed: install.success,
+        installRan: install.installed,
+        error: install.error,
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to create project" },

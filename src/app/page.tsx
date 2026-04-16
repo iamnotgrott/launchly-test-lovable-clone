@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { FilePanel } from "@/components/files/FilePanel";
 import { ChatView } from "@/components/chat/ChatView";
 import { FileTabs } from "@/components/files/FileTabs";
@@ -26,6 +26,7 @@ export default function Home() {
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightPanel, setRightPanel] = useState<RightPanel>(null);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [previewAutoStartSignal, setPreviewAutoStartSignal] = useState(0);
   const activeFile = useProjectStore((s) => s.activeFile);
   const activeProject = useProjectStore((s) => s.activeProject);
   const diffView = useCheckpointStore((s) => s.diffView);
@@ -40,6 +41,11 @@ export default function Home() {
   const toggleRightPanel = (panel: RightPanel) => {
     setRightPanel((prev) => (prev === panel ? null : panel));
   };
+
+  const handleTurnComplete = useCallback(() => {
+    setRightPanel("preview");
+    setPreviewAutoStartSignal(Date.now());
+  }, []);
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-100">
@@ -170,13 +176,13 @@ export default function Home() {
               rightPanel ? "w-1/2 border-r border-zinc-800" : "w-full"
             )}
           >
-            <ChatView />
+            <ChatView onTurnComplete={handleTurnComplete} />
           </div>
 
           {/* Right panel */}
           {rightPanel === "preview" && (
             <div className="w-1/2 flex flex-col min-w-0">
-              <PreviewFrame />
+              <PreviewFrame autoStartSignal={previewAutoStartSignal} />
             </div>
           )}
           {rightPanel === "editor" && activeFile && (

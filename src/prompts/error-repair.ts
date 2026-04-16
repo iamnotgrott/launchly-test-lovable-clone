@@ -15,7 +15,7 @@ ${filesContext}
 ## Instructions
 1. Analyze the error and identify the root cause
 2. Show the fix with minimal changes
-3. Use this format:
+3. Use this format (paths must be relative to project root, never absolute):
 
 \`\`\`file: path/to/file
 <complete updated file contents>

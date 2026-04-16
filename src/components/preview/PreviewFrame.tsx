@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useProjectStore } from "@/store/projectStore";
 import { Button } from "@/components/ui/Button";
 import { Play, Square, ExternalLink, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { PreviewSkeleton } from "@/components/ui/Skeleton";
 
-export function PreviewFrame() {
+interface PreviewFrameProps {
+  autoStartSignal?: number;
+}
+
+export function PreviewFrame({ autoStartSignal = 0 }: PreviewFrameProps) {
   const activeProject = useProjectStore((s) => s.activeProject);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -17,7 +21,9 @@ export function PreviewFrame() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const retryCount = useRef(0);
 
-  const startPreview = async () => {
+  const lastAutoStartSignal = useRef(0);
+
+  const startPreview = useCallback(async () => {
     if (!activeProject) return;
     setIsLoading(true);
     setError(null);
@@ -43,7 +49,14 @@ export function PreviewFrame() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeProject]);
+
+  useEffect(() => {
+    if (!activeProject || isRunning || isLoading || autoStartSignal <= 0) return;
+    if (lastAutoStartSignal.current === autoStartSignal) return;
+    lastAutoStartSignal.current = autoStartSignal;
+    startPreview();
+  }, [activeProject, autoStartSignal, isLoading, isRunning, startPreview]);
 
   const stopPreview = async () => {
     try {

@@ -101,9 +101,11 @@ export default function SettingsPage() {
                 <h2 className="text-sm font-medium text-zinc-200 mb-3">Models</h2>
                 <div className="space-y-3">
                   {[
-                    { name: "Qwen 3.6 Plus", id: "qwen/qwen3.6-plus:free", usage: "Default — chat & code generation" },
-                    { name: "Step 3.5 Flash", id: "stepfun/step-3.5-flash:free", usage: "Fast — planning & summaries" },
-                    { name: "Nemotron Super 120B", id: "nvidia/nemotron-3-super-120b-a12b:free", usage: "Fallback — error repair & heavy reasoning" },
+                    {
+                      name: "Nemotron Super 120B",
+                      id: "nvidia/nemotron-3-super-120b-a12b:free",
+                      usage: "All tasks — planning, code, repair, summaries",
+                    },
                   ].map((model) => (
                     <div key={model.id} className="flex items-start justify-between py-2 border-b border-zinc-800/50 last:border-0">
                       <div>

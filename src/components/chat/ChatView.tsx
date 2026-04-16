@@ -5,7 +5,11 @@ import { MessageList } from "./MessageList";
 import { Composer } from "./Composer";
 import { useChatStore } from "@/store/chatStore";
 
-export function ChatView() {
+interface ChatViewProps {
+  onTurnComplete?: () => void;
+}
+
+export function ChatView({ onTurnComplete }: ChatViewProps) {
   const clearChat = useChatStore((s) => s.clearChat);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +31,7 @@ export function ChatView() {
         </button>
       </div>
       <MessageList scrollRef={scrollRef} />
-      <Composer onMessageSent={handleMessageSent} />
+      <Composer onMessageSent={handleMessageSent} onTurnComplete={onTurnComplete} />
     </div>
   );
 }
